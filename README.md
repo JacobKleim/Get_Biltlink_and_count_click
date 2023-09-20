@@ -38,16 +38,16 @@
 
 ## Example of work
     
-      ```
+      
       $ python count_click.py
       Ведите ссылку: 
-      $ google.com
+      $ https://www.google.com/
       Битлинк bitly.is/6Rjn5
 
       $ python count_click.py
       Ведите ссылку:
       $ bitly.is/6Rjn5
       По вашей ссылке прошли: 15 раз(а)
-      ```
+      
 
 
