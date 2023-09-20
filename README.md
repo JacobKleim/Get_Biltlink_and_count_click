@@ -38,7 +38,7 @@
 
 ## Example of work
     
-      ```bash
+      ```
       $ python count_click.py
       Ведите ссылку: 
       $ google.com
