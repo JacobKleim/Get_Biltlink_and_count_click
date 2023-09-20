@@ -9,7 +9,11 @@
 ## How to use
 1. Clone this repository and go to the project folder:
    ```bash
-   cd /c/Get_Biltlink_and_count_count_click # for example
+   cd /c/project_folder # for example
+   
+   git clone git@github.com:JacobKleim/Get_Biltlink_and_count_click.git
+   
+   cd /c/project_folder/Get_Biltlink_and_count_count_click 
    ```
 
 2. Create a .env file with parameters:
