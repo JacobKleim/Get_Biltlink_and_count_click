@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 from urllib.parse import urlparse
 
@@ -6,19 +7,15 @@ from dotenv import load_dotenv
 
 
 def shorten_link(token, url):
-    url_get_bitlink = 'https://api-ssl.bitly.com/v4/bitlinks'
-    token_auth = {
+    base_url_for_getting_bitlink = 'https://api-ssl.bitly.com/v4/bitlinks'
+    header = {
      "Authorization": f"Bearer {token}",
     }
-    parse = urlparse(url)
-    if not parse.scheme:
-        url = 'https://' + url
-
     long_url = {
         "long_url": url,
     }
-    response = requests.post(url_get_bitlink,
-                             headers=token_auth,
+    response = requests.post(base_url_for_getting_bitlink,
+                             headers=header,
                              json=long_url)
     response.raise_for_status()
     bitlink = response.json()['id']
@@ -26,55 +23,61 @@ def shorten_link(token, url):
 
 
 def count_clicks(token, bitlink):
-    url_count_click = 'https://api-ssl.bitly.com/v4/bitlinks/{}/clicks/summary'
-    token_auth = {
+    base_url_for_counting_clicks = (
+        'https://api-ssl.bitly.com/v4/bitlinks/{}/clicks/summary')
+    header = {
      "Authorization": f"Bearer {token}",
     }
     params = {'units': '-1'}
-    parse = urlparse(bitlink)
-    if parse.scheme:
-        bitlink = parse.netloc + parse.path
-    url_for_check = url_count_click.format(bitlink)
-    response = requests.get(url_for_check, headers=token_auth, params=params)
+    parts_of_url = urlparse(bitlink)
+    bitlink = '{}{}'.format(parts_of_url.netloc, parts_of_url.path)
+    bitlink_for_counting_clicks = base_url_for_counting_clicks.format(bitlink)
+    response = requests.get(bitlink_for_counting_clicks,
+                            headers=header,
+                            params=params)
     response.raise_for_status()
     click_count = response.json()['total_clicks']
     return click_count
 
 
 def is_bitlink(token, url):
-    url_bitlink_info = 'https://api-ssl.bitly.com/v4/bitlinks/{}'
-    parse = urlparse(url)
-    if parse.scheme:
-        url = parse.netloc + parse.path
-    url_for_check = url_bitlink_info.format(url)
+    bitlink_info_url = 'https://api-ssl.bitly.com/v4/bitlinks/{}'
+    parts_of_url = urlparse(url)
+    url = '{}{}'.format(parts_of_url.netloc, parts_of_url.path)
+    url_for_check = bitlink_info_url.format(url)
     token_auth = {
      "Authorization": f"Bearer {token}",
     }
     response = requests.get(url_for_check, headers=token_auth)
-    if response.status_code == 200:
+    if response.ok:
         return True
     else:
         return False
 
 
-if __name__ == '__main__':
-
+def main():
     load_dotenv()
 
-    TOKEN_BITLINK = os.environ['TOKEN_BITLINK']
+    token_bitlink = os.environ['BITLINK_TOKEN']
 
-    url_for_check = input('Ведите ссылку: ')
+    url = input('Ведите ссылку: ')
 
-    if is_bitlink(TOKEN_BITLINK, url_for_check):
+    if is_bitlink(token_bitlink, url):
         try:
-            count_click = count_clicks(token=TOKEN_BITLINK,
-                                       bitlink=url_for_check)
+            count_click = count_clicks(token=token_bitlink,
+                                       bitlink=url)
         except requests.exceptions.HTTPError as error:
             print(f'Ошибка {error}, попробуйте еще раз')
+            sys.exit()
         print('По вашей ссылке прошли:', count_click, 'раз(а)')
     else:
         try:
-            bitlick = shorten_link(TOKEN_BITLINK, url_for_check)
+            bitlick = shorten_link(token_bitlink, url)
         except requests.exceptions.HTTPError as error:
             print(f'Ошибка {error}, попробуйте еще раз')
+            sys.exit()
         print('Битлинк', bitlick)
+
+
+if __name__ == '__main__':
+    main()
