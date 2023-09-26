@@ -7,14 +7,14 @@ from dotenv import load_dotenv
 
 
 def shorten_link(token, url):
-    base_url_for_getting_bitlink = 'https://api-ssl.bitly.com/v4/bitlinks'
+    url_getting_bitlink = 'https://api-ssl.bitly.com/v4/bitlinks'
     header = {
      "Authorization": f"Bearer {token}",
     }
     long_url = {
         "long_url": url,
     }
-    response = requests.post(base_url_for_getting_bitlink,
+    response = requests.post(url_getting_bitlink,
                              headers=header,
                              json=long_url)
     response.raise_for_status()
@@ -23,16 +23,17 @@ def shorten_link(token, url):
 
 
 def count_clicks(token, bitlink):
-    base_url_for_counting_clicks = (
-        'https://api-ssl.bitly.com/v4/bitlinks/{}/clicks/summary')
+    protocol = 'https://'
+    url = 'api-ssl.bitly.com/v4/bitlinks/{}/clicks/summary'
+    url_counting_clicks = '{}{}'.format(protocol, url)
     header = {
      "Authorization": f"Bearer {token}",
     }
     params = {'units': '-1'}
     parts_of_url = urlparse(bitlink)
     bitlink = '{}{}'.format(parts_of_url.netloc, parts_of_url.path)
-    bitlink_for_counting_clicks = base_url_for_counting_clicks.format(bitlink)
-    response = requests.get(bitlink_for_counting_clicks,
+    bitlink_counting_clicks = url_counting_clicks.format(bitlink)
+    response = requests.get(bitlink_counting_clicks,
                             headers=header,
                             params=params)
     response.raise_for_status()
@@ -45,26 +46,22 @@ def is_bitlink(token, url):
     parts_of_url = urlparse(url)
     url = '{}{}'.format(parts_of_url.netloc, parts_of_url.path)
     url_for_check = bitlink_info_url.format(url)
-    token_auth = {
+    header = {
      "Authorization": f"Bearer {token}",
     }
-    response = requests.get(url_for_check, headers=token_auth)
-    if response.ok:
-        return True
-    else:
-        return False
+    return requests.get(url_for_check, headers=header).ok
 
 
 def main():
     load_dotenv()
 
-    token_bitlink = os.environ['BITLINK_TOKEN']
+    bitlink_token = os.environ['BITLINK_TOKEN']
 
     url = input('Ведите ссылку: ')
 
-    if is_bitlink(token_bitlink, url):
+    if is_bitlink(bitlink_token, url):
         try:
-            count_click = count_clicks(token=token_bitlink,
+            count_click = count_clicks(token=bitlink_token,
                                        bitlink=url)
         except requests.exceptions.HTTPError as error:
             print(f'Ошибка {error}, попробуйте еще раз')
@@ -72,7 +69,7 @@ def main():
         print('По вашей ссылке прошли:', count_click, 'раз(а)')
     else:
         try:
-            bitlick = shorten_link(token_bitlink, url)
+            bitlick = shorten_link(bitlink_token, url)
         except requests.exceptions.HTTPError as error:
             print(f'Ошибка {error}, попробуйте еще раз')
             sys.exit()
