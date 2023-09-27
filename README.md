@@ -18,7 +18,7 @@
 
 2. Create a .env file with parameters:
    ```
-   TOKEN=some_token # add your token from bitlink
+   BITLINK_TOKEN=some_token # add your token from bitlink
    ```
 
 3. Сreate and activate a virtual environment:
