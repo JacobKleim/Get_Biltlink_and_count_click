@@ -24,14 +24,13 @@ def shorten_link(token, url):
 
 def count_clicks(token, bitlink):
     url = 'https://api-ssl.bitly.com/v4/bitlinks/{}/clicks/summary'
-    endpoint = url
     header = {
      "Authorization": f"Bearer {token}",
     }
     params = {'units': '-1'}
     parts_of_url = urlparse(bitlink)
     bitlink = '{}{}'.format(parts_of_url.netloc, parts_of_url.path)
-    formatted_url = endpoint.format(bitlink)
+    formatted_url = url.format(bitlink)
     response = requests.get(formatted_url,
                             headers=header,
                             params=params)
