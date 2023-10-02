@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import requests
@@ -53,9 +54,15 @@ def is_bitlink(token, url):
 def main():
     load_dotenv()
 
-    bitlink_token = os.environ['BITLINK_TOKEN']
+    parser = argparse.ArgumentParser()
 
-    url = input('Ведите ссылку: ')
+    parser.add_argument('url', help='Ведите ссылку')
+
+    args = parser.parse_args()
+
+    url = args.url
+
+    bitlink_token = os.environ['BITLINK_TOKEN']
 
     if is_bitlink(bitlink_token, url):
         try:
