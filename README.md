@@ -37,7 +37,7 @@
 
 5. Start the project:
    ```bash
-   python count_click.py
+   python main.py
    ```
 
 ## Example of work
